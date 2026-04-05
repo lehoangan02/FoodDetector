@@ -467,6 +467,14 @@ def navbar(active_page):
 def styling_css():
     with open('./assets/css/general-style.css') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    /* Fix Streamlit 1.56 expander icon rendering as text */
+    [data-testid="stExpanderToggleIcon"] { display: none; }
+    button[data-testid="stExpanderHeader"]::before { content: "▶ "; }
+    button[data-testid="stExpanderHeader"][aria-expanded="true"]::before { content: "▼ "; }
+    </style>
+    """, unsafe_allow_html=True)
  
         
 def home_page():
