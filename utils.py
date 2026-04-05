@@ -1,9 +1,20 @@
-import sys
-import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 import av
 from ultralytics import YOLO
+
+# Fix: ONNX models exported as float16 need fp16 auto-detected from input type
+try:
+    import ultralytics.nn.autobackend as _ab
+    import onnxruntime as _ort
+    _orig_init = _ab.AutoBackend.__init__
+
+    def _patched_init(self, *args, **kwargs):
+        _orig_init(self, *args, **kwargs)
+        if getattr(self, 'onnx', False) and hasattr(self, 'session'):
+            self.fp16 = self.session.get_inputs()[0].type == 'tensor(float16)'
+
+    _ab.AutoBackend.__init__ = _patched_init
+except Exception:
+    pass
 import streamlit as st
 import cv2
 from PIL import Image

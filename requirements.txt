@@ -19,3 +19,4 @@ torch
 matplotlib
 torchvision
 streamlit_navigation_bar
+ultralytics==8.2.74
