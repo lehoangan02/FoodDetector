@@ -2,7 +2,7 @@ opencv-python
 streamlit
 pillow
 psutil
-numpy==1.26.4
+numpy
 plotly
 dill
 streamlit-webrtc
@@ -15,7 +15,7 @@ huggingface_hub
 yt_dlp
 onnxruntime
 pytubefix
-torch==2.3.0
-matplotlib==3.9.1
-torchvision==0.18.0
+torch
+matplotlib
+torchvision
 streamlit_navigation_bar
