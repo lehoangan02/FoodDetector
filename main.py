@@ -131,8 +131,12 @@ def render_content():
                     <h4>Adjust the confident score 🚩</h4>
                     ''', unsafe_allow_html=True)
         confidence = float(st.slider(
-            label="",label_visibility="collapsed", min_value=10, max_value=100, value=50 
-        ))/ 100
+            label="Confidence score",
+            label_visibility="collapsed",
+            min_value=10,
+            max_value=100,
+            value=50,
+        )) / 100
         
         st.markdown(f'''
     <style>
@@ -308,9 +312,28 @@ def render_content():
     </style>
                         ''', unsafe_allow_html=True)
 
-            uploaded_file = st.file_uploader("Choose a picture", accept_multiple_files=False, type=['png', 'jpg', 'jpeg'])
+            if "image_input_mode" not in st.session_state:
+                st.session_state.image_input_mode = None
 
-            if uploaded_file:
+            col_btn1, col_btn2 = st.columns(2)
+            with col_btn1:
+                if st.button("Upload Photo", use_container_width=True):
+                    st.session_state.image_input_mode = "upload"
+            with col_btn2:
+                if st.button("Take Photo", use_container_width=True):
+                    st.session_state.image_input_mode = "camera"
+
+            uploaded_file = None
+            camera_photo = None
+
+            if st.session_state.image_input_mode == "upload":
+                uploaded_file = st.file_uploader("Choose a picture", accept_multiple_files=False, type=['png', 'jpg', 'jpeg'])
+            elif st.session_state.image_input_mode == "camera":
+                camera_photo = st.camera_input("Take a photo", label_visibility="hidden")
+
+            if camera_photo:
+                detect_image(confidence, model=model1, uploaded_file=camera_photo)
+            elif uploaded_file:
                 detect_image(confidence, model=model1, uploaded_file=uploaded_file)
 
                 # detections = detect_image_onnx(model, uploaded_file, confidence)

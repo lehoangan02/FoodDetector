@@ -302,9 +302,9 @@ def _display_detected_frame(conf, model, youtube_url=""):
 
 @st.cache_resource
 def load_model():
-    modelpath = r"./model/yolov10/YOLOv10m_new_total_VN_5_SGD.pt"
+    modelpath = r"./model/yolov10/YOLOv10m_new_total_VN_5_SGD.onnx"
     
-    model = YOLO(modelpath)
+    model = YOLO(modelpath, task="detect")
     return model
 
 def resize_image(image):

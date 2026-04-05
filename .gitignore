@@ -170,3 +170,4 @@ wandb/
 
 # calibration image
 calibration_*.npy
+/ultralytics
