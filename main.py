@@ -474,10 +474,18 @@ def styling_css():
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
     st.markdown("""
     <style>
-    /* Hide material icon wrapper in expander and file uploader */
-    [data-testid="stExpander"] span:has([data-testid="stIconMaterial"]),
-    [data-testid="stFileUploaderDropzone"] span:has([data-testid="stIconMaterial"]) {
+    /* Hide material icon wrapper in expander */
+    [data-testid="stExpander"] span:has([data-testid="stIconMaterial"]) {
         display: none !important;
+    }
+    /* Hide file uploader button, prepend UPLOAD: to instructions text */
+    [data-testid="stFileUploaderDropzone"] span:has([data-testid="stIconMaterial"]),
+    [data-testid="stFileUploaderDropzone"] button {
+        display: none !important;
+    }
+    [data-testid="stFileUploaderDropzoneInstructions"] span::before {
+        content: "UPLOAD: ";
+        font-weight: 600;
     }
     /* Yellow buttons: all st.button() calls */
     [data-testid="stButton"] button {
