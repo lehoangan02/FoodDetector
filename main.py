@@ -290,31 +290,19 @@ def render_content():
 - The results are generated when the user clicks the button and are named in the format: \`"%date-%month-%year".jpg/csv\`.
         """, unsafe_allow_html=True)
 
-        if "image_input_mode" not in st.session_state:
-            st.session_state.image_input_mode = None
         if "last_uploaded_file_id" not in st.session_state:
             st.session_state.last_uploaded_file_id = None
 
-        if st.button("Take Photo", use_container_width=True, key="upload_photo_btn"):
-            st.session_state.image_input_mode = "upload"
-            st.session_state.last_uploaded_file_id = None
-
-        uploaded_file = None
-        camera_photo = None
-
-        if st.session_state.image_input_mode == "upload":
-            uploaded_file = st.file_uploader("Choose a picture", accept_multiple_files=False, type=["png", "jpg", "jpeg"])
-        elif st.session_state.image_input_mode == "camera":
-            camera_photo = st.camera_input("Take a photo", label_visibility="hidden")
+        camera_photo = st.camera_input("Take a photo", label_visibility="hidden")
+        uploaded_file = st.file_uploader("Or upload from library", accept_multiple_files=False, type=["png", "jpg", "jpeg"])
 
         # Reset detect_image states when a new file is selected
-        current_file = uploaded_file or camera_photo
+        current_file = camera_photo or uploaded_file
         if current_file is not None:
             file_id = getattr(current_file, "file_id", getattr(current_file, "name", id(current_file)))
             if file_id != st.session_state.last_uploaded_file_id:
                 st.session_state.last_uploaded_file_id = file_id
                 st.session_state.button_clicked = False
-                st.session_state.is_reset = False
                 st.session_state.show_image = True
 
         if camera_photo:
