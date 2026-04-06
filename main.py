@@ -281,157 +281,37 @@ def render_content():
     </style>
 """, unsafe_allow_html=True)
         
-        tab1, tab2, tab3, tab4 = st.tabs(["Image", "Video", "Webcam", "IP Camera"])
+        st.subheader("Image Upload")
 
-        with tab1:
-            st.subheader("Image Upload")
-
-            st.markdown('''
-- Uploading image files from the user's local machine or using an image URL is supported.
+        st.markdown("""
+- Uploading image files from the user’s local machine or using an image URL is supported.
 - After the prediction process, two buttons will appear to download the results as an image file with bounding boxes or a CSV file.
-- The results are generated when the user clicks the button and are named in the format: `"%date-%month-%year".jpg/csv`.
-            ''', unsafe_allow_html=True)
-            
-            st.markdown(f'''
-    <style>
-    [data-testid="stExpanderDetails"] ul li {{
-        font-size: calc(12px + 0.1vw);
-        margin: 1rem 0 1rem 1.5rem;
-        color: black
-    }}
-    .stExpander p {{
-        font-size: calc(13px + 0.1vw);
-        font-weight: 700;
-        color: var(--brown);
-        padding-left: 0.5rem;
-    }}
-    .st-emotion-cache-1h9usn1 {{
-        background-color: var(--button-color-yellor);
-        font-size: calc(16px +1vw);
-    }}
+- The results are generated when the user clicks the button and are named in the format: \`"%date-%month-%year".jpg/csv\`.
+        """, unsafe_allow_html=True)
 
-    [data-testid="stExpanderDetails"] {{
-        background-color: var(--grey-light);
-        border-radius: 8px;
-    }}
-    </style>
-                        ''', unsafe_allow_html=True)
+        if "image_input_mode" not in st.session_state:
+            st.session_state.image_input_mode = None
 
-            if "image_input_mode" not in st.session_state:
-                st.session_state.image_input_mode = None
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button("Upload Photo", use_container_width=True, key="upload_photo_btn"):
+                st.session_state.image_input_mode = "upload"
+        with col_btn2:
+            if st.button("Take Photo", use_container_width=True, key="take_photo_btn"):
+                st.session_state.image_input_mode = "camera"
 
-            col_btn1, col_btn2 = st.columns(2)
-            with col_btn1:
-                if st.button("Upload Photo", use_container_width=True, key="upload_photo_btn"):
-                    st.session_state.image_input_mode = "upload"
-            with col_btn2:
-                if st.button("Take Photo", use_container_width=True, key="take_photo_btn"):
-                    st.session_state.image_input_mode = "camera"
+        uploaded_file = None
+        camera_photo = None
 
-            uploaded_file = None
-            camera_photo = None
+        if st.session_state.image_input_mode == "upload":
+            uploaded_file = st.file_uploader("Choose a picture", accept_multiple_files=False, type=["png", "jpg", "jpeg"])
+        elif st.session_state.image_input_mode == "camera":
+            camera_photo = st.camera_input("Take a photo", label_visibility="hidden")
 
-            if st.session_state.image_input_mode == "upload":
-                uploaded_file = st.file_uploader("Choose a picture", accept_multiple_files=False, type=['png', 'jpg', 'jpeg'])
-            elif st.session_state.image_input_mode == "camera":
-                camera_photo = st.camera_input("Take a photo", label_visibility="hidden")
-
-            if camera_photo:
-                detect_image(confidence, model=model1, uploaded_file=camera_photo)
-            elif uploaded_file:
-                detect_image(confidence, model=model1, uploaded_file=uploaded_file)
-
-                # detections = detect_image_onnx(model, uploaded_file, confidence)
-
-            # st.markdown('<br><br>', unsafe_allow_html=True)
-            # st.subheader("Enter a picture URL 	:link:")
-            # with st.form("picture_form"):
-            #     col1, col2 = st.columns([0.8, 0.2], gap="medium")
-            #     with col1:
-            #         picture_url = st.text_input("Label", label_visibility="collapsed", placeholder="https://ultralytics.com/images/bus.jpg")
-            #     with col2:
-            #         submitted = st.form_submit_button("Predict", use_container_width=True)
-            # if submitted and picture_url:
-            #     detect_image(confidence, model=model1, uploaded_file=picture_url, url=True)            
-
-        with tab2:
-                        
-            st.subheader("Video Upload")
-            expander = st.expander("Instructions: Video upload and URL")  
-            expander.write('''
-- Video: upload video files `(.mp4, .mpeg4, etc.)` from the user's local machine.
-- Youtube video or shorts URL links are supported for real-time prediction.
-- The results will be in a CSV file recording all dishes detected across all frames (no image results).
-            ''', unsafe_allow_html=True)
-            
-            uploaded_clip = st.file_uploader("Choose a clip", accept_multiple_files=False, type=['mp4'])
-            if uploaded_clip:
-                detect_video(conf=confidence, uploaded_file=uploaded_clip, model=model1)
-
-            else:
-                st.markdown('<br><br>', unsafe_allow_html=True) 
-                st.subheader("Enter YouTube URL")
-                # tube = st.empty()
-                with st.form("youtube_form"):
-                    col1, col2 = st.columns([0.8, 0.2], gap="medium")
-                    with col1:
-                        youtube_url = st.text_input("Label", label_visibility="collapsed", placeholder="https://youtu.be/LNwODJXcvt4")
-                    with col2:
-                        submitted = st.form_submit_button("Predict", use_container_width=True)
-                if submitted and youtube_url:            
-                    _display_detected_frame(conf=confidence, model=model1, 
-                                           
-                                            youtube_url=youtube_url)
-
-        with tab3:
-            
-            st.header("Webcam")
-            expander = st.expander("Instructions: Webcam connection")  
-            expander.write('''
-- Webcam: [Streamlit-webrtc](https://github.com/whitphx/streamlit-webrtc) is used to handle local webcam connection due to deployment on [Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud).
-- Users can choose their webcam input for live detection.
-- No result files will be generated as the process may run continuously.
-
-            ''', unsafe_allow_html=True)
-            detect_webcam(confidence, model=model1)
-
-        with tab4:
-            
-            st.header("IP Camera")
-            expander = st.expander("Instructions: IP Camera connection")  
-            expander.write('''
-- IP Camera: A RTSP address of the user’s camera must be provided.
-- The camera must be configured beforehand to allow connection from an external network.
-            ''', unsafe_allow_html=True)    
-            
-            st.text("Enter your Camera (RTSP) address: ")
-            with st.form("ip_camera_form"):
-                col1, col2 = st.columns([2, 8])
-                with col1:
-                    st.write("rtsp://admin:") 
-                with col2:
-                    address = st.text_input(
-                        "Label", 
-                        label_visibility="collapsed", 
-                        placeholder="hd543211@192.168.14.106:554/Streaming/channels/101"
-                    )
-                    
-                col1, col2 = st.columns([2, 1.35])
-                with col1:
-                    submitted = st.form_submit_button("Connect")
-                with col2:
-                    cancel = st.form_submit_button("Disconnect")
-            
-                if submitted:
-                    if address:
-                        detect_camera(confidence, model1, address=address)
-                    else:
-                        st.error("Please enter a valid RTSP camera URL")
-                
-                if cancel:
-                    if address:
-                        detect_camera(confidence, model1, address="")
-                        st.toast("Disconnected")
+        if camera_photo:
+            detect_image(confidence, model=model1, uploaded_file=camera_photo)
+        elif uploaded_file:
+            detect_image(confidence, model=model1, uploaded_file=uploaded_file)
 
     st.markdown('''
     <div>
