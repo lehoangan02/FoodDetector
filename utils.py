@@ -452,8 +452,6 @@ def detect_image_result(detected_image, model):
     if boxes:
         detected_img_arr_RGB = detected_image[0].plot()[:, :, ::1]
         detected_img_arr_BGR = detected_image[0].plot()[:, :, ::-1]
-        fig_detected = create_fig(detected_img_arr_BGR, detected=True)
-        st.plotly_chart(fig_detected, use_container_width=True)
 
         current_time = datetime.datetime.now()
         time_format = current_time.strftime("%d-%m-%Y")
@@ -699,21 +697,12 @@ def detect_image(conf, uploaded_file, model, url=False):
 
         resized_uploaded_image = resize_image(uploaded_image)
 
-        col1, col2 = st.columns([0.8, 0.2], gap="large")
-        with col1:
-            if not st.session_state.button_clicked:
-                st.markdown("**Original Image**")
-            else:
-                st.markdown("**Predicted Image**")
-        with col2:
-            if not st.session_state.button_clicked:
-                st.button("Predict", use_container_width=True, type="primary", on_click=on_predict)
-            else:
-                st.button("Reset", use_container_width=True, type="primary", on_click=on_reset)
-
         if not st.session_state.button_clicked:
-            st.image(resized_uploaded_image, output_format="JPEG", use_container_width=True)
+            st.button("Predict", use_container_width=True, type="primary", on_click=on_predict)
         else:
+            st.button("Reset", use_container_width=True, type="primary", on_click=on_reset)
+
+        if st.session_state.button_clicked:
             with st.spinner("Running..."):
                 detected_image = model.predict(resized_uploaded_image, conf=conf, imgsz=640)
                 detect_image_result(detected_image, model)        
