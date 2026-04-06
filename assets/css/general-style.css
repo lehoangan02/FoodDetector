@@ -162,7 +162,7 @@ h5 {
     right: 0;
     height: 60px;
     background-color: #0E1117;
-    z-index: 999999;
+    z-index: 2147483647;
     display: flex;
     justify-content: space-between;
     align-items: center;
