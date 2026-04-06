@@ -104,7 +104,10 @@ st.markdown(f"""
 # """, unsafe_allow_html=True)
 # End Cover
 
-def render_content():         
+model1 = load_model()
+load_onnx_model()
+
+def render_content():
     with st.container():
         # st.title("Welcome to _:green[FoodDetector]_ :male-detective:")
         st.divider()
@@ -245,8 +248,6 @@ def render_content():
 ''', unsafe_allow_html=True)
         
         st.markdown(f'''<br><br>''', unsafe_allow_html=True)        
-        model1 = load_model()
-        model = load_onnx_model()
 
         st.markdown("""
     <style>
@@ -291,14 +292,18 @@ def render_content():
 
         if "image_input_mode" not in st.session_state:
             st.session_state.image_input_mode = None
+        if "last_uploaded_file_id" not in st.session_state:
+            st.session_state.last_uploaded_file_id = None
 
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
             if st.button("Upload Photo", use_container_width=True, key="upload_photo_btn"):
                 st.session_state.image_input_mode = "upload"
+                st.session_state.last_uploaded_file_id = None
         with col_btn2:
             if st.button("Take Photo", use_container_width=True, key="take_photo_btn"):
                 st.session_state.image_input_mode = "camera"
+                st.session_state.last_uploaded_file_id = None
 
         uploaded_file = None
         camera_photo = None
@@ -307,6 +312,16 @@ def render_content():
             uploaded_file = st.file_uploader("Choose a picture", accept_multiple_files=False, type=["png", "jpg", "jpeg"])
         elif st.session_state.image_input_mode == "camera":
             camera_photo = st.camera_input("Take a photo", label_visibility="hidden")
+
+        # Reset detect_image states when a new file is selected
+        current_file = uploaded_file or camera_photo
+        if current_file is not None:
+            file_id = getattr(current_file, "file_id", getattr(current_file, "name", id(current_file)))
+            if file_id != st.session_state.last_uploaded_file_id:
+                st.session_state.last_uploaded_file_id = file_id
+                st.session_state.button_clicked = False
+                st.session_state.is_reset = False
+                st.session_state.show_image = True
 
         if camera_photo:
             detect_image(confidence, model=model1, uploaded_file=camera_photo)

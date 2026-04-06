@@ -145,7 +145,7 @@ def _display_detected_frame(conf, model, youtube_url=""):
 
                     im_rgb = Image.fromarray(im_bgr[..., ::-1])  
                     im_rgb_resized = im_rgb.resize((640, 640))        
-                    st_frame.image(im_rgb_resized, caption='Predicted Video', use_column_width=True)      
+                    st_frame.image(im_rgb_resized, caption='Predicted Video', use_container_width=True)      
                     for pred in r.boxes: 
                         class_id = int(pred.cls[0].item())
                         class_name = class_names[int(class_id)]["name"]
@@ -677,25 +677,20 @@ def detect_image_result(detected_image, model):
 def detect_image(conf, uploaded_file, model, url=False):
         if "button_clicked" not in st.session_state:
             st.session_state.button_clicked = False
-        
-        if "is_reset" not in st.session_state:
-            st.session_state.is_reset = False
-        
         if "show_image" not in st.session_state:
             st.session_state.show_image = True
 
-        reset_button = None
-        predict_button = None
-        
-        def toggle_button(reset = False):
-            st.session_state.button_clicked = not st.session_state.button_clicked
-            st.session_state.show_image = not st.session_state.show_image
-            if reset == True:
-                st.session_state.is_reset = not st.session_state.is_reset
-        
-        original_image = st.empty()
+        def on_predict():
+            st.session_state.button_clicked = True
+            st.session_state.show_image = False
 
-        if url==False:
+        def on_reset():
+            st.session_state.button_clicked = False
+            st.session_state.show_image = True
+            st.session_state.last_uploaded_file_id = None
+            st.session_state.image_input_mode = None
+
+        if url == False:
             uploaded_image = Image.open(uploaded_file)
         else:
             response = requests.get(uploaded_file)
@@ -704,26 +699,21 @@ def detect_image(conf, uploaded_file, model, url=False):
 
         resized_uploaded_image = resize_image(uploaded_image)
 
-        if st.session_state.show_image and not st.session_state.is_reset and not st.session_state.button_clicked:   
-            original_image = st.image(resized_uploaded_image, output_format="JPEG", use_column_width=True)
+        col1, col2 = st.columns([0.8, 0.2], gap="large")
+        with col1:
+            if not st.session_state.button_clicked:
+                st.markdown("**Original Image**")
+            else:
+                st.markdown("**Predicted Image**")
+        with col2:
+            if not st.session_state.button_clicked:
+                st.button("Predict", use_container_width=True, type="primary", on_click=on_predict)
+            else:
+                st.button("Reset", use_container_width=True, type="primary", on_click=on_reset)
 
-        if not st.session_state.is_reset:
-            col1, col2 = st.columns([0.8, 0.2], gap="large")
-            with col1:
-                if st.session_state.show_image and not st.session_state.button_clicked and not original_image == st.empty():
-                    st.markdown("**Original Image**")
-                elif not st.session_state.show_image and st.session_state.button_clicked:
-                    st.markdown("**Predicted Image**")
-            with col2:
-                if not st.session_state.button_clicked:
-                    predict_button = st.button("Predict", use_container_width=True, type="primary", on_click=toggle_button)
-                else:
-                    reset_button = st.button("Reset", use_container_width=True, type="primary", on_click=toggle_button, args=[True])
-                    uploaded_file = None
-        if st.session_state.show_image and st.session_state.is_reset and not st.session_state.button_clicked:
-            st.session_state.is_reset = False
-
-        if st.session_state.button_clicked and not reset_button:
+        if not st.session_state.button_clicked:
+            st.image(resized_uploaded_image, output_format="JPEG", use_container_width=True)
+        else:
             with st.spinner("Running..."):
                 detected_image = model.predict(resized_uploaded_image, conf=conf, imgsz=640)
                 detect_image_result(detected_image, model)        
@@ -783,7 +773,7 @@ def detect_camera(conf, model, address):
                         frame_count = 0
                     cv2.putText(im_bgr, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2) 
                     im_rgb = Image.fromarray(im_bgr[..., ::-1])
-                    st_frame.image(im_rgb, caption='Camera IP', use_column_width=True)
+                    st_frame.image(im_rgb, caption='Camera IP', use_container_width=True)
 
                     for pred in r.boxes:
                         class_id = int(pred.cls[0].item())
@@ -1269,7 +1259,7 @@ def detect_from_file(conf, video_file, model):
             cv2.putText(im_bgr, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             im_rgb = Image.fromarray(im_bgr[..., ::-1])
-            st_frame.image(im_rgb, caption='Predicted video', use_column_width=True)
+            st_frame.image(im_rgb, caption='Predicted video', use_container_width=True)
 
     
             for pred in r.boxes:
