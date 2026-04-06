@@ -295,15 +295,9 @@ def render_content():
         if "last_uploaded_file_id" not in st.session_state:
             st.session_state.last_uploaded_file_id = None
 
-        col_btn1, col_btn2 = st.columns(2)
-        with col_btn1:
-            if st.button("Upload Photo", use_container_width=True, key="upload_photo_btn"):
-                st.session_state.image_input_mode = "upload"
-                st.session_state.last_uploaded_file_id = None
-        with col_btn2:
-            if st.button("Take Photo", use_container_width=True, key="take_photo_btn"):
-                st.session_state.image_input_mode = "camera"
-                st.session_state.last_uploaded_file_id = None
+        if st.button("Take Photo", use_container_width=True, key="upload_photo_btn"):
+            st.session_state.image_input_mode = "upload"
+            st.session_state.last_uploaded_file_id = None
 
         uploaded_file = None
         camera_photo = None
