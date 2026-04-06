@@ -21,8 +21,6 @@ st.set_page_config(
 # <style>
 #     .stImage  {{
 #         position: relative;
-#         width: 100%;
-#         height: calc(100px + 7vw);
 #         overflow: hidden;
 #     }}
 # """, unsafe_allow_html=True)
@@ -50,7 +48,7 @@ st.markdown(f"""
 <div class="header-container">
     <img src="data:image/jpg;base64,{img_base64}" class="header-image">
     <div class="header-overlay">
-        <div class="header-title">Welcome to FoodDetector 🕵️</div>
+        <div class="header-title">Welcome to FoodDetector</div>
         <div class="header-subtitle">An easy way to detect Vietnamese dishes!</div>
     </div>
 </div>
@@ -128,7 +126,7 @@ def render_content():
         st.divider()
 
         st.markdown(f'''
-                    <h4>Adjust the confident score 🚩</h4>
+                    <h4>Adjust the confident score</h4>
                     ''', unsafe_allow_html=True)
         confidence = float(st.slider(
             label="Confidence score",
@@ -158,11 +156,12 @@ def render_content():
     }}
 
     p.define.subtitle-text-score {{
+        margin-top: 0.8rem;
         margin-bottom: 1rem;
     }}
     
     </style>
-    <p class="define" id="quick-note"><strong>Quick note 📝</strong>: consideration for selecting the best suited confident score:</p>
+    <p class="define" id="quick-note"><strong>Quick note</strong>: consideration for selecting the best suited confident score:</p>
     <div class="adjust-section">
         <p class="define title-text-score">High confident score (>= 50%):</p>
         <p class="define subtitle-text-score">Set a higher threshold will make the model to predict with a higher accuracy detection but it will have a low recall as fewer object will 
@@ -175,20 +174,27 @@ def render_content():
 
         st.divider()
         st.markdown(f'''
-                    <h4>Nutrition value score📊</h4>
+                    <h4>Nutrition value score</h4>
                     ''', unsafe_allow_html=True)
 
         st.markdown(f'''
     <ul class="define nutrition" style="margin-top: 0; margin-bottom: 0;">
-        <li class="define-li home-page">Our nutrition values are based on the <strong>Traffic Light system</strong>🚦.</li>
+        <li class="define-li home-page">Our nutrition values are based on the <strong>Traffic Light system</strong>.</li>
         <li class="define-li home-page">All nutrition information provided is approximate.</li>
     </ul>
                     ''', unsafe_allow_html=True)
         
-
+        # Initialize session state for nutrition details toggle
+        if "show_nutrition_details" not in st.session_state:
+            st.session_state.show_nutrition_details = False
         
-        expander = st.expander("See more")  
-        expander.write(f'''
+        # Toggle button
+        if st.button("See more", key="nutrition_toggle", use_container_width=False):
+            st.session_state.show_nutrition_details = not st.session_state.show_nutrition_details
+        
+        # Show nutrition details if toggle is on
+        if st.session_state.show_nutrition_details:
+            st.markdown(f'''
 <div class="nutrition-container">
     <img src="data:image/jpg;base64,{img_base64_nutrition}" class="nutrition-img">
     <ul class="nutrition-explain">
@@ -278,15 +284,14 @@ def render_content():
         tab1, tab2, tab3, tab4 = st.tabs(["Image", "Video", "Webcam", "IP Camera"])
 
         with tab1:
-            st.subheader("Image Upload :frame_with_picture:")
+            st.subheader("Image Upload")
 
-            # Accordion
-            expander = st.expander("Instructions: Image upload and URL")  
-            expander.write('''
-    - Uploading image files from the user's local machine or using an image URL is supported.
-    - After the prediction process, two buttons will appear to download the results as an image file with bounding boxes or a CSV file.
-    - The results are generated when the user clicks the button and are named in the format: `"%date-%month-%year".jpg/csv`.
+            st.markdown('''
+- Uploading image files from the user's local machine or using an image URL is supported.
+- After the prediction process, two buttons will appear to download the results as an image file with bounding boxes or a CSV file.
+- The results are generated when the user clicks the button and are named in the format: `"%date-%month-%year".jpg/csv`.
             ''', unsafe_allow_html=True)
+            
             st.markdown(f'''
     <style>
     [data-testid="stExpanderDetails"] ul li {{
@@ -317,10 +322,10 @@ def render_content():
 
             col_btn1, col_btn2 = st.columns(2)
             with col_btn1:
-                if st.button("Upload Photo", use_container_width=True):
+                if st.button("Upload Photo", use_container_width=True, key="upload_photo_btn"):
                     st.session_state.image_input_mode = "upload"
             with col_btn2:
-                if st.button("Take Photo", use_container_width=True):
+                if st.button("Take Photo", use_container_width=True, key="take_photo_btn"):
                     st.session_state.image_input_mode = "camera"
 
             uploaded_file = None
@@ -351,7 +356,7 @@ def render_content():
 
         with tab2:
                         
-            st.subheader("Video Upload :movie_camera:")
+            st.subheader("Video Upload")
             expander = st.expander("Instructions: Video upload and URL")  
             expander.write('''
 - Video: upload video files `(.mp4, .mpeg4, etc.)` from the user's local machine.
@@ -365,7 +370,7 @@ def render_content():
 
             else:
                 st.markdown('<br><br>', unsafe_allow_html=True) 
-                st.subheader("Enter YouTube URL :tv:")
+                st.subheader("Enter YouTube URL")
                 # tube = st.empty()
                 with st.form("youtube_form"):
                     col1, col2 = st.columns([0.8, 0.2], gap="medium")
@@ -380,7 +385,7 @@ def render_content():
 
         with tab3:
             
-            st.header("Webcam :camera:")
+            st.header("Webcam")
             expander = st.expander("Instructions: Webcam connection")  
             expander.write('''
 - Webcam: [Streamlit-webrtc](https://github.com/whitphx/streamlit-webrtc) is used to handle local webcam connection due to deployment on [Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud).
@@ -392,7 +397,7 @@ def render_content():
 
         with tab4:
             
-            st.header("IP Camera :video_camera:")
+            st.header("IP Camera")
             expander = st.expander("Instructions: IP Camera connection")  
             expander.write('''
 - IP Camera: A RTSP address of the user’s camera must be provided.
@@ -426,7 +431,7 @@ def render_content():
                 if cancel:
                     if address:
                         detect_camera(confidence, model1, address="")
-                        st.toast("Disconnected", icon="✅")
+                        st.toast("Disconnected")
 
     st.markdown('''
     <div>
@@ -453,8 +458,8 @@ def navbar(active_page):
     return f"""
     <div class="custom-navbar">
         <div class="nav-items">
-            <a href="/main" target="_self" class="nav-item {'active' if active_page == 'Home' else ''}">🏠 Home</a>
-            <a href="/dataset" target="_self" class="nav-item {'active' if active_page == 'About' else ''}">📄 About</a>
+            <a href="/main" target="_self" class="nav-item {'active' if active_page == 'Home' else ''}">Home</a>
+            <a href="/dataset" target="_self" class="nav-item {'active' if active_page == 'About' else ''}">About</a>
         </div>
         <a href="https://github.com/nvhnam/FoodDetector" target="_blank" class="nav-item">
             <svg id="github-icon" height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true">
@@ -469,10 +474,21 @@ def styling_css():
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
     st.markdown("""
     <style>
-    /* Fix Streamlit 1.56 expander icon rendering as text */
-    [data-testid="stExpanderToggleIcon"] { display: none; }
-    button[data-testid="stExpanderHeader"]::before { content: "▶ "; }
-    button[data-testid="stExpanderHeader"][aria-expanded="true"]::before { content: "▼ "; }
+    /* Hide material icon wrapper in expander and file uploader */
+    [data-testid="stExpander"] span:has([data-testid="stIconMaterial"]),
+    [data-testid="stFileUploaderDropzone"] span:has([data-testid="stIconMaterial"]) {
+        display: none !important;
+    }
+    /* Yellow buttons: all st.button() calls */
+    [data-testid="stButton"] button {
+        background-color: #FEC51C !important;
+        color: black !important;
+        border-color: #FEC51C !important;
+    }
+    [data-testid="stButton"] button:hover {
+        background-color: #fcd96b !important;
+        border-color: #fcd96b !important;
+    }
     </style>
     """, unsafe_allow_html=True)
  

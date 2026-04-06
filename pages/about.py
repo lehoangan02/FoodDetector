@@ -2,10 +2,10 @@ import streamlit as st
 
 st.set_page_config(
     page_title="FoodDetector",
-    page_icon=":microscope:"
+    page_icon=""
 )
 
-st.title(":bookmark_tabs: About FoodDetector")
+st.title(" About FoodDetector")
 st.divider()
 st.markdown('''_A one-stop website for anyone that want to remotely track the eating activity of their family member._
 ##### FoodDetector will have 3 main sections as follows:

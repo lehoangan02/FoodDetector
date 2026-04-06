@@ -4,7 +4,7 @@ from pathlib import Path
 
 st.set_page_config(
     page_title="FoodDetector",
-    page_icon=":microscope:"
+    page_icon=""
 )
 
 def img_to_base64(img_path):
@@ -22,7 +22,7 @@ st.markdown(f"""
 <div class="header-container">
     <img src="data:image/jpg;base64,{img_base64}" class="header-image">
     <div class="header-overlay">
-        <div class="header-title2">📃 About 📃</div>
+        <div class="header-title2"> About </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -108,7 +108,7 @@ st.markdown("""
 
 
 def render_content():  
-    # st.title(":package: Dataset")
+    # st.title(" Dataset")
     
     st.markdown('''
     <div id="dataset-section"></div>
@@ -222,7 +222,7 @@ def render_content():
     ''', unsafe_allow_html=True)
     st.divider()
     st.markdown('''
-    <h4 id="data-gathering-section" class="dataset-page">🔍 Data Gathering 🔍</h4>
+    <h4 id="data-gathering-section" class="dataset-page"> Data Gathering </h4>
     <p class="define dataset-page">These pictures were collected from different sources to ensure its variety and complexity.</p>
     <ul class="define dataset-page">
         <li class="define-li dataset-page"><code>Google, Facebook, Shopee Food</code>: Most of the images were gathered from these platforms by searching the dish name with some keyword like "food review" or "cooking".</li>
@@ -285,8 +285,8 @@ def navbar(active_page):
    
     <div class="custom-navbar">
         <div class="nav-items">
-            <a href="/main" target="_self" class="nav-item {'active' if active_page == 'Home' else ''}">🏠 Home</a>
-            <a href="/dataset" target="_self" class="nav-item {'active' if active_page == 'About' else ''}">📄 About</a>
+            <a href="/main" target="_self" class="nav-item {'active' if active_page == 'Home' else ''}"> Home</a>
+            <a href="/dataset" target="_self" class="nav-item {'active' if active_page == 'About' else ''}"> About</a>
         </div>
         <a href="https://github.com/nvhnam/FoodDetector" target="_blank" class="nav-item">
             <svg id="github-icon" height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true">
