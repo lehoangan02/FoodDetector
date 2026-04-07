@@ -126,55 +126,7 @@ def render_content():
                     ''', unsafe_allow_html=True)
 
 
-        st.divider()
-
-        st.markdown(f'''
-                    <h4>Adjust the confident score</h4>
-                    ''', unsafe_allow_html=True)
-        confidence = float(st.slider(
-            label="Confidence score",
-            label_visibility="collapsed",
-            min_value=10,
-            max_value=100,
-            value=50,
-        )) / 100
-        
-        st.markdown(f'''
-    <style>
-        #quick-note {{
-        margin-left: 0;
-        margin-bottom: 0.5rem;
-    }}
-    
-    p#quick-note.define {{
-        margin-top: 0;
-    }}
-
-    .title-text-score {{
-        font-weight: 700;
-        border-radius: 5px;
-        background-color: var(--grey);
-        padding: 0.5rem;
-        display: inline;
-    }}
-
-    p.define.subtitle-text-score {{
-        margin-top: 0.8rem;
-        margin-bottom: 1rem;
-    }}
-    
-    </style>
-    <p class="define" id="quick-note"><strong>Quick note</strong>: consideration for selecting the best suited confident score:</p>
-    <div class="adjust-section">
-        <p class="define title-text-score">High confident score (>= 50%):</p>
-        <p class="define subtitle-text-score">Set a higher threshold will make the model to predict with a higher accuracy detection but it will have a low recall as fewer object will 
-        be detected because of the high precision constraint.</p>
-        <p class="define title-text-score">Low confident score (< 50%):</p>        
-        <p class="define subtitle-text-score">Set a lower threshold will enable the model to detect more object - 
-    high recall because of the low precision constraint.</p>
-    </div>     
-                ''', unsafe_allow_html=True)
-
+        confidence = 0.5
         st.divider()
         st.markdown(f'''
                     <h4>Nutrition value score</h4>
