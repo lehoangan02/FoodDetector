@@ -1,4 +1,5 @@
-import av
+from __future__ import annotations
+
 from ultralytics import YOLO
 
 # Fix: ONNX models exported as float16 need fp16 auto-detected from input type
@@ -19,7 +20,25 @@ import streamlit as st
 import cv2
 from PIL import Image
 import tempfile
-from streamlit_webrtc import VideoProcessorBase, WebRtcMode, webrtc_streamer, VideoTransformerBase
+
+try:
+    import av
+except Exception as exc:
+    av = None
+    _AV_IMPORT_ERROR = exc
+else:
+    _AV_IMPORT_ERROR = None
+
+try:
+    from streamlit_webrtc import VideoProcessorBase, WebRtcMode, webrtc_streamer, VideoTransformerBase
+except Exception as exc:
+    VideoProcessorBase = object
+    VideoTransformerBase = object
+    WebRtcMode = None
+    webrtc_streamer = None
+    _WEBRTC_IMPORT_ERROR = exc
+else:
+    _WEBRTC_IMPORT_ERROR = None
 
 import numpy as np
 from io import BytesIO
@@ -976,6 +995,15 @@ class VideoTransformer(VideoTransformerBase):
 
 
 def detect_webcam(conf, model):
+    if _AV_IMPORT_ERROR is not None or _WEBRTC_IMPORT_ERROR is not None:
+        st.error(
+            "Webcam detection is unavailable because its WebRTC dependencies "
+            "could not be loaded. On Streamlit Cloud, redeploy the app with "
+            "Python 3.11 selected in Advanced settings."
+        )
+        st.info("Image, video, YouTube, and IP camera detection can still run.")
+        return
+
     webrtc_ctx = webrtc_streamer(
         key="webcam_1",
         mode=WebRtcMode.SENDRECV,
